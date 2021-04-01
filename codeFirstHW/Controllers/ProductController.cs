@@ -1,7 +1,13 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using codeFirstHW.Db;
+using codeFirstHW.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -9,79 +15,127 @@ namespace codeFirstHW.Controllers
 {
     public class ProductController : Controller
     {
-        // GET: ProductController
-        public ActionResult Index()
+        private readonly ILogger<HomeController> _logger;
+        private readonly DataContext _dataContext;
+
+        public ProductController(ILogger<HomeController> logger, DataContext dataContext)
         {
-            return View();
+            _dataContext = dataContext;
+            _logger = logger;
+
+        }
+        [HttpGet]
+        public async Task<IActionResult> Index(string category)
+        {
+            List<Product> lst = new List<Product>();
+            if (category == null)
+            {
+                lst = await _dataContext.Products.ToListAsync();
+            }
+            else
+            {
+                lst = await _dataContext.Products.Where(p => p.Category.Name.Equals(category)).ToListAsync();
+            }
+            return View(lst);
         }
 
-        // GET: ProductController/Details/5
-        public ActionResult Details(int id)
+
+
+        [HttpGet]
+        public async Task<IActionResult> Create()
         {
-            return View();
+            var rez = await _dataContext.Categories.ToListAsync();
+
+            return View(new Product()
+            {
+                Categories = rez.Select(p => new SelectListItem { Text = p.Name, Value = p.Id.ToString() }).ToList()
+            });
         }
 
-        // GET: ProductController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: ProductController/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<IActionResult> Create(Product model)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                return RedirectToAction(nameof(Index));
+                return View(model);
             }
-            catch
+
+            _dataContext.Products.Add(new Product()
             {
-                return View();
-            }
+                Name = model.Name,
+                Price = model.Price,
+                CategoryId = model.CategoryId
+            });
+
+            await _dataContext.SaveChangesAsync();
+
+            return RedirectToAction("Index");
         }
 
-        // GET: ProductController/Edit/5
-        public ActionResult Edit(int id)
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
         {
-            return View();
-        }
+            if (id <= 0)
+            {
+                return RedirectToAction("Index");
+            }
 
-        // POST: ProductController/Edit/5
+            var rez = await _dataContext.Products.FindAsync(id);
+
+            if (rez == null)
+            {
+                return RedirectToAction("Index");
+            }
+            return View(new Product()
+            {
+                Id = rez.Id,
+                Name = rez.Name,
+                Price = rez.Price,
+                Categories = await _dataContext.Categories.Select(p => new SelectListItem { Text = p.Name, Value = p.Id.ToString() }).ToListAsync()
+            });
+        }
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<IActionResult> Edit(Category model)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                return RedirectToAction(nameof(Index));
+                return View(model);
             }
-            catch
+
+            var rez = _dataContext.Categories.Find(model.Id);
+            if (rez == null)
             {
-                return View();
+                return RedirectToAction("Index");
             }
+
+            rez.Name = model.Name;
+            await _dataContext.SaveChangesAsync();
+
+            return RedirectToAction("Index");
         }
 
-        // GET: ProductController/Delete/5
-        public ActionResult Delete(int id)
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
         {
-            return View();
+            if (id <= 0)
+            {
+                return RedirectToAction("Index");
+            }
+            var rez = _dataContext.Products.Find(id);
+            if (rez == null)
+            {
+                return RedirectToAction("Index");
+            }
+            _dataContext.Products.Remove(rez);
+            await _dataContext.SaveChangesAsync();
+            return RedirectToAction("Index");
+        }
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        // POST: ProductController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
     }
 }
