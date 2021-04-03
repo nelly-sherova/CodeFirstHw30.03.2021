@@ -1,0 +1,41 @@
+﻿@model List<Product>
+@{
+    ViewData["Title"] = "Список продуктов";
+}
+
+<div class="d-flex justify-content-end mb-3">
+    
+        <a href="~/Product/Create" class="btn btn-dark">Добавить продукт</a>
+    
+</div>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Price</th>
+        <th>CategoryId</th>
+        <th>info</th>
+
+    </tr>
+        </thead>
+    <tbody>
+    @foreach (var per in Model)
+    {
+        <tr>
+            <td scope="row">ID: @per.Id</td>
+            <td >Название: @per.Name</td>
+            <td>Цена: @per.Price TJS</td>
+            <td>Категория: <a href="~/Product/Index?category=@per.Category.Name">@per.Category.Name</a></td>
+            <td class="d-flex">
+                <a href="~/Product/Edit?id=@per.Id" class="btn btn-primary mr-1">
+                    &#9998;
+                </a>
+                <a href="~/Product/Delete?id=@per.Id" class="btn btn-danger">X</a>
+                             
+            </td>
+        </tr>
+    }
+        </tbody>
+</table>

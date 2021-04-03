@@ -1,5 +1,6 @@
 ﻿using codeFirstHW.Db;
 using codeFirstHW.Models;
+using codeFirstHW.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -65,7 +66,7 @@ namespace codeFirstHW.Controllers
             {
                 return RedirectToAction("Index");
             }
-            return View(new Category()
+            return View(new CategoryViewModul()
             {
                 Id = rez.Id,
                 Name = rez.Name,
@@ -73,7 +74,7 @@ namespace codeFirstHW.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(Category model)
+        public async Task<IActionResult> Edit(CategoryViewModul model)
         {
             if (!ModelState.IsValid)
             {

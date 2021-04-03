@@ -27,7 +27,7 @@ namespace codeFirstHW
         {
             services.AddDbContext<DataContext>(opt =>
             {
-                opt.UseSqlServer(Configuration.GetConnectionString("Default"));
+                opt.UseSqlServer(Configuration.GetConnectionString("Default")).UseLazyLoadingProxies();
             });
             services.AddControllersWithViews();
         }

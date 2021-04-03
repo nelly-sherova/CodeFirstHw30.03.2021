@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using codeFirstHW.ViewModels;
 
 namespace codeFirstHW.Controllers
 {
@@ -44,9 +45,10 @@ namespace codeFirstHW.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
+            //await _dataContext.Categories.Add(new Category() { Name="" });
             var rez = await _dataContext.Categories.ToListAsync();
 
-            return View(new Product()
+            return View(new ProductViewModel()
             {
                 Categories = rez.Select(p => new SelectListItem { Text = p.Name, Value = p.Id.ToString() }).ToList()
             });
@@ -86,7 +88,7 @@ namespace codeFirstHW.Controllers
             {
                 return RedirectToAction("Index");
             }
-            return View(new Product()
+            return View(new ProductViewModel()
             {
                 Id = rez.Id,
                 Name = rez.Name,

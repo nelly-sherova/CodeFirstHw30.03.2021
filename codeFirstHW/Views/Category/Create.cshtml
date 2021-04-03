@@ -1,0 +1,12 @@
+﻿@model codeFirstHW.ViewModels.CategoryViewModul
+@{ ViewData["Title"] = "Create category"; }
+
+<form action="Create" method="post">
+    <div asp-validation-summary="All" class="text-danger  mb-1"></div>
+    <div class="input-group row mb-1">
+        <label class="col-md-2 form-control" asp-for="Name"></label>
+        <input class="form-control col-lg-12" asp-for="Name" required />
+    </div>
+</form>
+
+
